@@ -1,4 +1,4 @@
-from models import db, Player, Powers
+from models import db, Author, Books
 from flask import request, redirect, url_for, render_template
 
 def roout_route(app):
@@ -10,14 +10,15 @@ def roout_route(app):
     @app.route("/create", methods = ['POST', 'GET'])
     def create_usr(): 
         if request.method == "POST":
-            playername = request.form['player']
-            powername = request.form['power']
-            new_player = Player(play_name = playername)
-            db.session.add(new_player)
+            authorname = request.form['author']
+            bookname = request.form['book']
+
+            new_author = Author(name = authorname)
+            db.session.add(new_author)
             db.session.commit()
-            if powername != "":
-                new_power = Powers(name = powername, player = new_player)
-                db.session.add(new_power)
+            if authorname != "":
+                new_book = Books(name = bookname, author = new_author)
+                db.session.add(new_book)
                 db.session.commit()
             
 
