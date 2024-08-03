@@ -12,18 +12,122 @@
             align-items: center;
             background-color: #333; 
         }
+
+        .join {
+            display: flex;
+            flex-direction: column;
+            /* justify-content: center; */
+            align-items: center;
+            gap: 2em;
+        }
+
+        .join input {
+            padding: 1em;
+            font-size: 1.5em;
+        }
+
+        .join1 {
+            padding: 2em;
+            background-color: white;
+            /* display: none; */
+        }
+
+        .btn {
+            background-color: #333;
+            padding: 1em 2em;
+            color: white;
+
+        }
+
+        .box {
+            height: 70vh;
+            width: 800px;
+            background-color: white;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            display: none;
+            flex-direction: column;
+        }
+
+        .box input {
+            padding: .5em;
+            font-size: 1.2em;
+        }
+
+        .box p {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5em;
+        }
+        
+        .ul {
+            height: 60vh;
+            width: 700px;
+            border: 2px solid black;
+            display: flex;
+            gap: .5em;
+            flex-direction: column;
+        }
+        
     </style>
+    <!-- <script src="../socket.io.min.js"></script> -->
+    <script src="../static/socket.io.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" integrity="sha512-luMnTJZ7oEchNDZAtQhgjomP1eZefnl82ruTH/3Oj/Yu5qYtwL7+dVRccACS/Snp1lFXq188XFipHKYE75IaQQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 </head>
 <body>
 
-    <form action="
-    ", method="post">
-    <p>
-        <Label>Choose File</Label>
-        <input type="file" name="image" id="image">
+   <div id="join" action=""  class="join1">
+    <p class="join">
+        <input type="text" minlength='4' required placeholder="Username" id="username">
+        <input id="join-btn" type="submit" class="btn" for="username"></input>
     </p>
-    <input type="submit" value="submit">
-</form>
-    
+   </div>
+
+   <!--  -->
+   
+   <div id="box" class="box">
+    <ul id="ul" class="ul">
+
+    </ul>
+    <div id="message">
+        <p>
+            <input id="sms" type="text"  placeholder="message">
+        </p>
+    </div>
+   </div>
+    <script>
+        var socket = io({autoConnect : false})
+
+        document.getElementById('join-btn').addEventListener('click', (e) => {
+            e.preventDefault()
+            
+            socket.connect()
+            username = document.getElementById('username').value
+
+            socket.on('connect', () => {
+                socket.emit('user_join', username)
+            })
+            document.getElementById('box').style.display = 'flex'
+            document.getElementById('join').style.display = 'none'
+        })
+        // socket.connect()
+        
+        document.getElementById('message').addEventListener('keyup', (event) => {
+            event.preventDefault()
+            if (event.key == 'Enter') {
+                message = document.getElementById('sms').value
+                socket.emit('message', message)
+            }
+        })
+
+        socket.on('chat', (data) => {
+            let box = document.getElementById('ul')
+            let p = document.createElement('p')
+            p.innerText = data['sms']
+            box.appendChild(p)
+        })
+    </script>
 </body>
 </html>

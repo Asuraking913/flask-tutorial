@@ -1,6 +1,8 @@
 from app import create_app
+from events import socket
 
 flask_app = create_app()
 
 if __name__ == "__main__":
-    flask_app.run()
+    socket.run(flask_app)
+    # flask_app.run()
