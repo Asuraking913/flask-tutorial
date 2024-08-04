@@ -6,128 +6,105 @@
     <title>Document</title>
     <style>
         body {
+            height: 100vh;
             display: flex;
             justify-content: center;
-            height: 100vh;
             align-items: center;
-            background-color: #333; 
-        }
-
-        .join {
-            display: flex;
-            flex-direction: column;
-            /* justify-content: center; */
-            align-items: center;
-            gap: 2em;
-        }
-
-        .join input {
-            padding: 1em;
-            font-size: 1.5em;
-        }
-
-        .join1 {
-            padding: 2em;
-            background-color: white;
-            /* display: none; */
-        }
-
-        .btn {
-            background-color: #333;
-            padding: 1em 2em;
-            color: white;
-
         }
 
         .box {
-            height: 70vh;
-            width: 800px;
-            background-color: white;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            display: none;
-            flex-direction: column;
+            gap: 2em;
         }
 
-        .box input {
-            padding: .5em;
+        .text-box {
+            border: 2px solid black;
+            height: 80vh;
+            width: 800px;
+            display: none;
+            border-radius: 1em;
+            margin-bottom: 2em;
+        }
+
+        .text-submit input {
             font-size: 1.2em;
         }
 
-        .box p {
+        .text-submit {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: .5em;
+            gap: 1em;
         }
-        
-        .ul {
-            height: 60vh;
-            width: 700px;
-            border: 2px solid black;
-            display: flex;
-            gap: .5em;
-            flex-direction: column;
+
+        .text-message input {
+            width: 100%;
+            font-size: 1.2em;
+            color: red;
         }
-        
+
+        .text-message {
+            display: none;
+        }
+
+
     </style>
-    <!-- <script src="../socket.io.min.js"></script> -->
-    <script src="../static/socket.io.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" integrity="sha512-luMnTJZ7oEchNDZAtQhgjomP1eZefnl82ruTH/3Oj/Yu5qYtwL7+dVRccACS/Snp1lFXq188XFipHKYE75IaQQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- <script src="{{ url_for('static', filename='socket.io.min.js') }}">    </script>     -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" integrity="sha512-luMnTJZ7oEchNDZAtQhgjomP1eZefnl82ruTH/3Oj/Yu5qYtwL7+dVRccACS/Snp1lFXq188XFipHKYE75IaQQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
+    <div class="box">
+        <div id="text-box" class="text-box ">
 
-   <div id="join" action=""  class="join1">
-    <p class="join">
-        <input type="text" minlength='4' required placeholder="Username" id="username">
-        <input id="join-btn" type="submit" class="btn" for="username"></input>
-    </p>
-   </div>
-
-   <!--  -->
-   
-   <div id="box" class="box">
-    <ul id="ul" class="ul">
-
-    </ul>
-    <div id="message">
-        <p>
-            <input id="sms" type="text"  placeholder="message">
-        </p>
+        </div>
+        <div id="user"  class="text-submit">
+                <input placeholder="Enter your name" type="text" name="username" id="username">
+                <input id="user-sub" type="submit" value="Submit">
+        </div>
+        <div id="message" class="text-message">
+            <input  type="text" placeholder="message" name="message" id="message1">
+        </div>
     </div>
-   </div>
     <script>
         var socket = io({autoConnect : false})
+        const message = document.getElementById('message')
+        const submitUser = document.getElementById('user-sub')
+        const username = document.getElementById('username')
+        const textBox = document.getElementById('text-box')
 
-        document.getElementById('join-btn').addEventListener('click', (e) => {
+        submitUser.addEventListener('click', (e) => {
             e.preventDefault()
-            
+
             socket.connect()
-            username = document.getElementById('username').value
+
+            let user = username.value
 
             socket.on('connect', () => {
-                socket.emit('user_join', username)
+                socket.emit('joined', user)
             })
-            document.getElementById('box').style.display = 'flex'
-            document.getElementById('join').style.display = 'none'
+            console.log(username.value)
+
+            username.style.display = 'none'
+            document.getElementById('user').style.display = 'none'
+            message.style.display = 'block'
+            textBox.style.display = 'block'
+
         })
-        // socket.connect()
-        
-        document.getElementById('message').addEventListener('keyup', (event) => {
-            event.preventDefault()
-            if (event.key == 'Enter') {
-                message = document.getElementById('sms').value
-                socket.emit('message', message)
-            }
+
+        document.getElementById('message1').addEventListener('keyup', (e) =>{
+            if (e.key == 'Enter') {
+                let newSms = e.target.value
+                console.log(newSms)
+            socket.emit('message', newSms)}
         })
 
         socket.on('chat', (data) => {
-            let box = document.getElementById('ul')
             let p = document.createElement('p')
-            p.innerText = data['sms']
-            box.appendChild(p)
+            p.innerHTML =  `${data['user']} : ${data['sms']}`
+            p.style.fontSize = '1.2em'
+            textBox.appendChild(p)
         })
+
+
+
     </script>
 </body>
 </html>

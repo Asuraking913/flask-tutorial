@@ -5,21 +5,19 @@ from flask_socketio import emit
 users = {}
 
 @socket.on('connect')
-def handle_connect():
-    print('Client connected')
+def connect_user(): 
+    print('Client Connected')
 
-@socket.on('user_join')
-def handle_join(user): 
-    print(f'User {user} joined')
-    users[user] = request.sid
-    print(users, "event")
+@socket.on('joined')
+def user_joined(name):
+    users[request.sid] = name
+    print(f'user {name} joined!!')
 
 @socket.on('message')
-def handle_message(sms):
-    print(f'user sent messag  {sms}')
-    print(request.sid)
+def send_message(sms):
+    print(f'user Send sms: {sms}')
     userName = None
-    for user in users:
-        if users[user] == request.sid:
-            userName = user
-            emit('chat', {'sms' : f"{userName} : {sms}"}, broadcast=True)
+    if request.sid in users:
+        userName = users[request.sid]
+        socket.emit('chat', {"sms" : sms, "user": userName} )
+    
